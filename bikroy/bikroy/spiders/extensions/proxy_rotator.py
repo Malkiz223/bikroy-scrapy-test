@@ -37,7 +37,7 @@ class ProxyLine(ProxyPool):
     """В рамках тестового задания прокси просто захардкожены."""
 
     def _load_proxies(self):
-        self.proxies = [
+        self.proxies = [  # истекают 21.09.22 в 19:24
             'http://KjSzTTV6:nHdF2DrJ@193.8.175.43:47949',
             'http://KjSzTTV6:nHdF2DrJ@193.150.170.243:57311',
             'http://KjSzTTV6:nHdF2DrJ@45.138.212.252:64825',
