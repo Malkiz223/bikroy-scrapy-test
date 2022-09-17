@@ -1,8 +1,7 @@
 from urllib.parse import urljoin, urlparse
 
 
-def get_full_link(domain: str, url: str) -> str:
-    return urljoin(domain, url)
+SPIDER_DATE_PARSED_CATEGORY_PATH = '{spider_name}_parsed_category_stats.json'
 
 
 def get_url_without_query(url: str) -> str:
