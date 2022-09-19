@@ -6,7 +6,7 @@ from urllib.parse import urljoin, urlparse
 
 logger = logging.getLogger(__name__)
 
-CACHE_CATEGORY_PATH = Path('./spiders/cache')
+CACHE_CATEGORY_PATH = Path('./bikroy/spiders/cache')
 CATEGORY_STATS_FILENAME = '{spider_name}_parsed_category_stats.json'
 
 

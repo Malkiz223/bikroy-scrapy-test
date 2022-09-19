@@ -156,7 +156,7 @@ class BikroyComParser:
         return result
 
     def parsed_before(self, product_updated_timestamp: int, category_url: str) -> bool:
-        previous_parsed_timestamp = self.previous_parsed_category_dates.get(category_url)
+        previous_parsed_timestamp = self.latest_category_stats.get(category_url)
         if previous_parsed_timestamp:
             return previous_parsed_timestamp > product_updated_timestamp
         return False
@@ -168,9 +168,9 @@ class BikroyComParser:
 
         creation_timestamp = item['creation_timestamp']
 
-        min_parsed_category_timestamp = self.current_parsed_category_dates.get(category_url)
+        min_parsed_category_timestamp = self.current_category_stats.get(category_url)
         if not min_parsed_category_timestamp or creation_timestamp > min_parsed_category_timestamp:
-            self.current_parsed_category_dates[category_url] = creation_timestamp
+            self.current_category_stats[category_url] = creation_timestamp
 
     def get_json_data(self, response) -> dict:
         json_data = re.search(r'window.initialData = ({.*})', response.text).group(1)
@@ -216,41 +216,22 @@ class BikroySpiderSpider(Spider, BikroyComParser):
                 yield Request(url=url, callback=self.parse_categories)
 
     def parse_categories(self, response):
+
         category_urls = self.get_category_urls(response)
         category_urls = self.get_cleared_category_urls(response, category_urls)
-
         if category_urls:
             for url in category_urls:
-                yield Request(url=url, callback=self.parse_subcategories, dont_filter=True)
-        else:  # уже выбрана подкатегория
-            yield Request(url=response.url, callback=self.parse_cities, dont_filter=True)
+                yield Request(url=url, callback=self.parse_categories, dont_filter=True)
+            return
 
-    def parse_subcategories(self, response):
-        subcategory_urls = self.get_category_urls(response)
-        subcategory_urls = self.get_cleared_category_urls(response, subcategory_urls)
-        for url in subcategory_urls:
-            yield Request(url=url, callback=self.parse_cities, dont_filter=True)
-
-    def parse_cities(self, response):
         city_urls = self.get_location_urls(response)
         city_urls = self.get_cleared_category_urls(response, city_urls)
-
         if city_urls:
             for url in city_urls:
-                yield Request(url=url, callback=self.parse_city_regions, dont_filter=True)
-        else:  # уже выбран район города
-            category_url = get_url_without_query(response.url)
-            yield Request(url=response.url, callback=self.parse, dont_filter=True,
-                          meta={'category_url': category_url})
+                yield Request(url=url, callback=self.parse_categories, dont_filter=True)
+            return
 
-    def parse_city_regions(self, response):
-        city_region_urls = self.get_location_urls(response)
-        city_region_urls = self.get_cleared_category_urls(response, city_region_urls)
-
-        for url in city_region_urls:
-            category_url = get_url_without_query(url)
-            yield Request(url=url, callback=self.parse, dont_filter=True,
-                          meta={'category_url': category_url})
+        yield Request(url=response.url, callback=self.parse, dont_filter=True, meta={'category_url': response.url})
 
     def parse(self, response):
         json_data = self.get_json_data(response)
