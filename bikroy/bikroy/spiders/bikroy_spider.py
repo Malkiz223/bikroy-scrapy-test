@@ -190,7 +190,7 @@ class BikroySpiderSpider(Spider, BikroyComParser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.start_urls = [
-            # 'https://bikroy.com/en/ads/bangladesh',  # все товары и категории сайта
+            'https://bikroy.com/en/ads/bangladesh',  # все товары и категории сайта
             # 'https://bikroy.com/en/ads/bangladesh/property',  # жильё (имеет адреса)
             # 'https://bikroy.com/en/ads/mirpur/laptops',  # ноутбуки по одному району города
             # 'https://bikroy.com/en/ad/ek-baar-o-bybhaar-kraa-hyyniphul-phresh-for-sale-dhaka',  # продуктовая страница
