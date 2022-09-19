@@ -10,7 +10,7 @@
 
 Клонируйте проект, запустив в терминале команду:<br>
 ```bash
-git clone https://github.com/Malkiz223/bikroy-scrapy-test.git && cd bikroy-scrapy
+git clone https://github.com/Malkiz223/bikroy-scrapy-test.git && cd bikroy-scrapy-test
 ```
 <hr>
 Создайте виртуальное окружение командой:<br>
@@ -29,7 +29,7 @@ venv\Scripts\activate
 ```
 <hr>
 
-#### Установите зависимости:<br>
+#### Установите зависимости:
 ```bash
 pip install -r requirements.txt
 ```
@@ -38,7 +38,10 @@ pip install -r requirements.txt
 
 После установки и настройки мы готовы приступить к первому запуску.
 
-Командой `cd bikroy` перейдите в родительскую папку проекта<br>
+#### Перейдите в родительскую папку проекта:
+```bash
+cd bikroy
+```
 #### Для запуска паука по нескольким ссылкам укажите их через "|":
 ```bash
 scrapy crawl bikroy.com -a start_urls="https://bikroy.com/en/ads/bangladesh/mobiles|https://bikroy.com/en/ads/bangladesh/vehicles" -o result.json
