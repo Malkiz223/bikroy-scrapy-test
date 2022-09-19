@@ -177,19 +177,6 @@ class BikroyComParser:
 
 class BikroySpiderSpider(Spider, BikroyComParser):
     name = 'bikroy.com'
-    custom_settings = {
-        'DOWNLOAD_TIMEOUT': 60,
-        'CONCURRENT_REQUESTS': 10,
-        'DOWNLOAD_DELAY': 0.2,
-        'RETRY_TIMES': 10,
-        'DOWNLOADER_MIDDLEWARES': {
-            'bikroy.spiders.extensions.proxy_rotator.ProxyRotator': 100,
-        },
-        'ITEM_PIPELINES': {
-            'bikroy.pipelines.DuplicatesPipeline': 50,
-        },
-        'USER_AGENT': CHROME_USERAGENT,
-    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
