@@ -155,7 +155,10 @@ class BikroyComParser:
         return False
 
     def update_parsed_category_date(self, response, item: ProductItem):
-        category_url = response.meta['category_url']
+        category_url = response.meta.get('category_url')
+        if not category_url:
+            return
+
         creation_timestamp = item['creation_timestamp']
 
         min_parsed_category_timestamp = self.current_parsed_category_dates.get(category_url)
@@ -174,6 +177,9 @@ class BikroyComParser:
             return category_urls[right_index:]
         return category_urls
 
+    def is_product_url(self, url: str) -> bool:
+        return '/ad/' in url
+
 
 class BikroySpiderSpider(Spider, BikroyComParser):
     name = 'bikroy.com'
@@ -181,9 +187,10 @@ class BikroySpiderSpider(Spider, BikroyComParser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.start_urls = [
-            'https://bikroy.com/en/ads/bangladesh',  # все товары и категории сайта
+            # 'https://bikroy.com/en/ads/bangladesh',  # все товары и категории сайта
             # 'https://bikroy.com/en/ads/bangladesh/property',  # жильё (имеет адреса)
             # 'https://bikroy.com/en/ads/mirpur/laptops',  # ноутбуки по одному району города
+            # 'https://bikroy.com/en/ad/ek-baar-o-bybhaar-kraa-hyyniphul-phresh-for-sale-dhaka',  # продуктовая страница
         ]
         dispatcher.connect(self.spider_closed, signals.spider_closed)
         self.previous_parsed_category_dates = get_previous_parsed_category_dates(self.name)
@@ -199,7 +206,10 @@ class BikroySpiderSpider(Spider, BikroyComParser):
 
     def start_requests(self):
         for url in self.start_urls:
-            yield Request(url=url, callback=self.parse_categories)
+            if self.is_product_url(url):
+                yield Request(url=url, callback=self.parse_product)
+            else:
+                yield Request(url=url, callback=self.parse_categories)
 
     def parse_categories(self, response):
         category_urls = self.get_category_urls(response)
