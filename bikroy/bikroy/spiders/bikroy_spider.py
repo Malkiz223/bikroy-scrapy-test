@@ -13,8 +13,8 @@ from scrapy import Request, Spider, signals
 from w3lib.url import url_query_parameter, add_or_replace_parameter, add_or_replace_parameters
 
 from .constants.bikroy_com import *
-from .helpers.helpers import get_url_without_query, get_previous_parsed_category_dates, \
-    save_parsed_category_dates
+from .helpers.helpers import get_url_without_query, get_latest_category_stats, \
+    save_current_category_stats
 from ..items import ProductItem
 
 logger = logging.getLogger(__name__)
@@ -142,6 +142,10 @@ class BikroyComParser:
         return total_products > page_size * current_page
 
     def get_product_updated_dates(self, products: list) -> list:
+        """
+        Возвращает время обновления продуктов в категории.
+        Подставляет 0, если не смог собрать время обновления (товар поднят в выдаче).
+        """
         result = []
         for product in products:
             try:
@@ -187,25 +191,22 @@ class BikroyComParser:
 class BikroySpiderSpider(Spider, BikroyComParser):
     name = 'bikroy.com'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.start_urls = [
-            'https://bikroy.com/en/ads/bangladesh',  # все товары и категории сайта
-            # 'https://bikroy.com/en/ads/bangladesh/property',  # жильё (имеет адреса)
-            # 'https://bikroy.com/en/ads/mirpur/laptops',  # ноутбуки по одному району города
-            # 'https://bikroy.com/en/ad/ek-baar-o-bybhaar-kraa-hyyniphul-phresh-for-sale-dhaka',  # продуктовая страница
+    def __init__(self, start_urls=None, **kwargs):
+        super().__init__(**kwargs)
+        self.start_urls = start_urls.split('|') if start_urls else [
+            'https://bikroy.com/en/ads',  # все категории сайта
         ]
         dispatcher.connect(self.spider_closed, signals.spider_closed)
-        self.previous_parsed_category_dates = get_previous_parsed_category_dates(self.name)
-        self.current_parsed_category_dates = dict()
+        self.latest_category_stats = get_latest_category_stats(self.name)
+        self.current_category_stats = dict()
 
     def spider_closed(self, spider):
         """
         При повторном запуске для ускорения работы паука сохраняем данные
         о времени создания объявления, с которого начали парсить категорию.
         """
-        self.previous_parsed_category_dates.update(self.current_parsed_category_dates)
-        save_parsed_category_dates(self.name, self.previous_parsed_category_dates)
+        self.latest_category_stats.update(self.current_category_stats)
+        save_current_category_stats(self.name, self.latest_category_stats)
 
     def start_requests(self):
         for url in self.start_urls:
