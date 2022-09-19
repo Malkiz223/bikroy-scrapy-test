@@ -13,7 +13,11 @@
 git clone https://github.com/Malkiz223/bikroy-scrapy-test.git && cd bikroy-scrapy
 ```
 <hr>
+Создайте виртуальное окружение командой:<br>
 
+```bash
+python -m venv venv
+```
 Активируйте виртуальное окружение следующей командой (в зависимости от ОС и терминала):<br>
 #### Linux 
 ```bash
