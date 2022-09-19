@@ -54,7 +54,10 @@ class BikroyComParser:
 
     @optional_field()
     def get_author_phone(self, prod_data: dict) -> Optional[str]:
-        return prod_data['contactCard']['phoneNumbers'][0]['number']
+        phone_number = prod_data['contactCard']['phoneNumbers'][0]['number']
+        if phone_number.startswith('0'):
+            phone_number = f'+88{phone_number}'
+        return phone_number
 
     def get_creation_timestamp(self, prod_data: dict) -> int:
         creation_timestamp = prod_data['adDate']
