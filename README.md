@@ -28,3 +28,7 @@
 `scrapy crawl bikroy.com -o my_json_file_name.json`
 
 Флаг `-o` позволяет сохранить полученные данные в файл.
+
+## Пример собираемых данных
+
+[example.json](example.json)
