@@ -141,10 +141,10 @@ class BikroyComParser:
     def get_product_updated_dates(self, products: list) -> list:
         result = []
         for product in products:
-            creation_date = dateparser.parse(product['timeStamp'])
             try:
+                creation_date = dateparser.parse(product['timeStamp'])
                 result.append(int(creation_date.timestamp()))
-            except AttributeError:  # поднятые объявления не имеют даты обновления
+            except (AttributeError, KeyError):  # поднятые объявления не имеют даты обновления
                 result.append(0)
         return result
 
